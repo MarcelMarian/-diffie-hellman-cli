@@ -10,8 +10,18 @@ DEFAULT_APPNAME=diffie-hellman-service
 : "${OS:=${DEFAULT_OS}}"
 : "${APPNAME:=${DEFAULT_APPNAME}}"
 
+remove_dangling () {
+  echo "Removing dangling containers"
+  # docker rmi -f $(docker images -f dangling=true -q)
+  docker image prune -f
+}
+
 echo "Cleaning up"
 rm -f *.gz
 rm -f bin/${APPNAME}
 rm -f bin/${OS}_arm64/${APPNAME}
 rm -f bin/${OS}_arm/${APPNAME}
+rm -rf ./cmd/${APPNAME}/*.pb.go
+rm -f go.mod
+rm -f go.sum
+rm -rf vendor/
