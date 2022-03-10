@@ -20,7 +20,7 @@ DEFAULT_VERSION=$(git describe --match 'v[0-9]*' --dirty='.m' --always)
 DEFAULT_REVISION=$(git rev-parse HEAD)$(if ! git diff --no-ext-diff --quiet --exit-code; then echo .m; fi)
 DEFAULT_ARCH=amd64
 DEFAULT_PROTODIR=proto
-DEFAULT_APPNAME=cspgo
+DEFAULT_APPNAME=diffie-hellman-service
 
 : "${OS:=linux}"
 : "${ARCH:=${DEFAULT_ARCH}}"

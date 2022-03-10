@@ -6,11 +6,13 @@ set -eu
 
 DEFAULT_OS=linux
 DEFAULT_ARCH=amd64
-DEFAULT_APPNAME=cspgo
+DEFAULT_APPNAME=diffie-hellman-service
 DEFAULT_VERSION=1.0.0
 DEFAULT_REGISTRY=registry.gear.ge.com/csp
 DEFAULT_BASE_IMAGE=scratch
 DEFAULT_APPSOURCE=bin
+DEFAULT_APPCONFIG=config
+DEFAULT_IMAGENAME=diffie-hellman-client
 
 : "${OS:=${DEFAULT_OS}}"
 : "${ARCH:=${DEFAULT_ARCH}}"
@@ -19,6 +21,8 @@ DEFAULT_APPSOURCE=bin
 : "${REGISTRY:=${DEFAULT_REGISTRY}}"
 : "${BASEIMAGE:=${DEFAULT_BASE_IMAGE}}"
 : "${APPSOURCE:=${DEFAULT_APPSOURCE}}"
+: "${APPCONFIG:=${DEFAULT_APPCONFIG}}"
+: "${IMAGENAME:=${DEFAULT_IMAGENAME}}"
 
 if [ "$ARCH" != "$DEFAULT_ARCH" ]; then
   APPSOURCE=bin/${OS}_${ARCH}
@@ -30,8 +34,9 @@ if [ -f ${APPSOURCE}/${APPNAME} ]; then
   sed -e "s|{ARG_SRC}|${APPSOURCE}|g" \
       -e "s|{ARG_BIN}|${APPNAME}|g" \
       -e "s|{ARG_FROM}|${BASEIMAGE}|g" \
+      -e "s|{ARG_CFG}|${APPCONFIG}|g" \
     Dockerfile.in > dockerfile-${APPNAME}-${OS}_${ARCH}
-  docker build -t ${REGISTRY}/${APPNAME}:${TAG} -f dockerfile-${APPNAME}-${OS}_${ARCH} .
+  docker build -t ${REGISTRY}/${IMAGENAME}:${TAG} -f dockerfile-${APPNAME}-${OS}_${ARCH} .
   rm -f dockerfile-${APPNAME}-${OS}_${ARCH}
 else
   echo "Could not find ${APPSOURCE}/${APPNAME}"

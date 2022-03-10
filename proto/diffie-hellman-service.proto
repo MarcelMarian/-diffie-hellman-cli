@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package main;
+
+option go_package = "cmd/diffie-hellman-service;main";
+
+message PingPongMessage {
+	string msg = 1;
+}
+
+message PKeyMessage {
+	int64 seqno = 1;
+	bytes pubkey = 2;
+}
+
+////////////////////////////
+// gRPC Service Definition's
+////////////////////////////
+
+service DhGrpcService {
+	rpc Ping(PingPongMessage) returns (PingPongMessage){}
+	rpc CliXchgKey(PKeyMessage) returns (PKeyMessage){}
+}

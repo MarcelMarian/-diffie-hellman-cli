@@ -1,24 +1,13 @@
-# Go Application Template
-
-This is a template for a Go application. It is based heavily on the repo here : https://github.com/thockin/go-build-template (but it does not use make).
-
-The template is aligned with the best practice Go project layout, details of which can be found [here](https://github.com/golang-standards/project-layout).
-
-The example application can be used to demonstrate how to deploy a containerised application to Predix Edge OS and interact with the
-Predix Edge Broker (a standard component) using MQTT, Redis and Minio. The example also demonstrates how to communicate with the Edge
-Agent (via its REST API).
-
-**Check back often as the example application is updated continuously**.
-
-For more details of integrating the example see the information at the end of this README.
-
-The **example** application requires the following environment variables defined:
+# Go Diffie-Hellman client
+This is an example of a Diffie-Hellman key exchange algorythm. This example implements a gRPC client that exchanges the public key with a server application.  
+The server side implementation is in the diffie-hellman-srv repo.
+To run this example on a Linux distribution the following step should be followed:
+- build both the server and the client containers (see the [Building](#building) section)
+- make sure you have the docker-compose or docker stack installed on the host system
+- run
+```bash
+docker-compose up
 ```
-MQTT_HOST
-REDIS_HOST
-MINIO_HOST
-```
-The values of these environment variables is supplied via the `docker-compose-template.yml` file when deploying on Predix Edge OS.
 
 ## Signing Tools
 
@@ -64,10 +53,10 @@ The variables (and their default values are shown below).
 |----------|-------------|---------------|
 | `OS` | The value of GOOS to use | `linux` |
 | `ARCH` | The value of GOARCH to use | `amd64` |
-| `APPNAME` | The name of the application binary | `cspgo` |
+| `APPNAME` | The name of the application binary | `diffie-hellman-service` |
 | `VERSION` | The semantic version of the application | `1.0.0` |
 | `REGISTRY` | The Docker Trusted Registry to push and pull to/from | `registry.gear.ge.com/csp` |
-| `BUILD_IMAGE` | The name of the build container | `cspgo-golang:1.16.0-buster` |
+| `BUILD_IMAGE` | The name of the build container | `diffie-hellman-service-golang:1.16.0-buster` |
 | `PROTODIR` | The location of protocol buffer files | `proto` |
 | `BASE_IMAGE` | The base of the application container | `scratch` |
 
@@ -135,23 +124,23 @@ Discover the IP address of the Predix Edge OS instance to which you want to depl
 
 Copy the application `.tar.gz` file to the Predix Edge instance; for example:
 ```bash
-scp ./cspgo-1.0.0-amd64.tar.gz root@$IPADDR:/mnt/data/.
+scp ./diffie-hellman-service-1.0.0-amd64.tar.gz root@$IPADDR:/mnt/data/.
 ```
 where `IPADDR` is the IP address of the target.
 
-Login to the target using ssh and deploy the application giving it an instance identifer of `cspgo`:
+Login to the target using ssh and deploy the application giving it an instance identifer of `diffie-hellman-service`:
 ```bash
 cd /mnt/data
 curl http://localhost/api/v1/applications \
     --unix-socket /var/run/edge-core/edge-core.sock \
     -X POST \
-    -F "file=@cspgo-1.0.0-amd64.tar.gz" \
-    -H "app_name: cspgo"
+    -F "file=@diffie-hellman-service-1.0.0-amd64.tar.gz" \
+    -H "app_name: diffie-hellman-service"
 ```
 
 The application can subsequently be deleted as follows:
 ```bash
-curl http://localhost/api/v1/applications/cspgo \
+curl http://localhost/api/v1/applications/diffie-hellman-service \
     --unix-socket /var/run/edge-core/edge-core.sock \
     -X DELETE
 ```
@@ -164,26 +153,26 @@ Two shell scripts `scp-file.sh` and `ssh-deploy.sh` are provided to perform this
 
 Copy the application `.tar.gz` file to the Predix Edge instance; for example:
 ```bash
-scp ./cspgo-1.0.0-amd64.tar.gz root@$IPADDR:/mnt/data/.
+scp ./diffie-hellman-service-1.0.0-amd64.tar.gz root@$IPADDR:/mnt/data/.
 ```
 where `IPADDR` is the IP address of the target.
 
-Login to the target using ssh and deploy the application giving it an instance identifer of `cspgo`,
+Login to the target using ssh and deploy the application giving it an instance identifer of `diffie-hellman-service`,
 note we are able to do this by remounting the root file system as read write:
 ```bash
 mount -o rw,remount /
-mv /mnt/data/cspgo.tar.gz /opt/application-system-containers/cspgo.tar.gz
-docker stack rm cspgo
+mv /mnt/data/diffie-hellman-service.tar.gz /opt/application-system-containers/diffie-hellman-service.tar.gz
+docker stack rm diffie-hellman-service
 set -o allexport
 . /opt/edge-agent/edge-agent-environment
 set +o allexport
 sleep 5
-/opt/edge-agent/app-deploy cspgo /opt/application-system-containers/cspgo.tar.gz
+/opt/edge-agent/app-deploy diffie-hellman-service /opt/application-system-containers/diffie-hellman-service.tar.gz
 ```
 
 The application can subsequently be deleted as follows:
 ```bash
-/opt/edge-agent/app-delete --appInstanceId=cspgo
+/opt/edge-agent/app-delete --appInstanceId=diffie-hellman-service
 ```
 
 ## Predix Edge Technician Console (PETC) Method

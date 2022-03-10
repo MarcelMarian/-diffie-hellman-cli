@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+    grpc-server:
+        image: "registry.gear.ge.com/csp/diffie-hellman-server:1.0.0__linux_amd64"
+        # environment:
+        #     config: "/config/config.json"
+        # depends_on:
+        #     - "mbserver"
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.1'
+                    memory: 50M
+        networks:
+            - predix-edge-broker_net
+    grpc-client:
+        image: "registry.gear.ge.com/csp/diffie-hellman-client:1.0.0__linux_amd64"
+        # depends_on:
+        #     - "grpc-server"
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.1'
+                    memory: 50M
+        networks:
+            - predix-edge-broker_net
+        # command: ["/testGrpcClient"]
+networks:
+  predix-edge-broker_net:
+    external: false
+    name: predix-edge-broker_net

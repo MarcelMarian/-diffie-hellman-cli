@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-  cspgo:
+  diffie-hellman-service:
     image: registry.gear.ge.com/csp/{ARG_NAME}:{ARG_VERSION}__{ARG_OS}_{ARG_ARCH}
     networks:
       - predix-edge-broker_net

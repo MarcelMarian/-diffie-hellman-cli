@@ -6,11 +6,11 @@ set -eu
 
 DEFAULT_OS=linux
 DEFAULT_ARCH=amd64
-DEFAULT_APPNAME=cspgo
+DEFAULT_APPNAME=diffie-hellman-service
 DEFAULT_VERSION=1.0.0
 DEFAULT_REGISTRY=registry.gear.ge.com/csp
 DEFAULT_PROTODIR=proto
-DEFAULT_BUILD_IMAGE=cspgo-golang:1.16.0-buster
+DEFAULT_BUILD_IMAGE=diffie-hellman-service-golang:1.16.0-buster
 
 : "${OS:=${DEFAULT_OS}}"
 : "${ARCH:=${DEFAULT_ARCH}}"

@@ -1,0 +1,10 @@
+{
+    "appName": "diffie-hellman-server",
+    "gRPCServerConfig": {
+        "tlsEnable": false,
+        "url": "grpc-server",
+        "port": 10000,
+        "certFile": "/config/server_cert.pem",
+        "keyFile": "/config/server_key.pem"
+    }
+}

@@ -5,7 +5,7 @@
 
 set -eu
 
-DEFAULT_APPNAME=cspgo
+DEFAULT_APPNAME=diffie-hellman-service
 DEFAULT_REGISTRY=registry.gear.ge.com/csp
 DEFAULT_BASE_BUILD_IMAGE=golang:1.16.0-buster
 

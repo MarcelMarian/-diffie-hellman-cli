@@ -2,7 +2,7 @@
     "manifest": {
         "edgecore": [
             {
-              "service": "cspgo"
+              "service": "diffie-hellman-service"
             }
         ]
     }

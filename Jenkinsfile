@@ -15,7 +15,7 @@ pipeline {
 
     environment { 
         ARCH = 'amd64' 
-        NAME = 'cspgo'
+        NAME = 'diffie-hellman-service'
         VERSION = '1.0.0'
         DTR = 'registry.gear.ge.com'
         DTR_CREDS = credentials('CSP_DTR_CREDENTIALS')
@@ -58,7 +58,7 @@ pipeline {
                   def fileSpec = """{
                       "files": [
                         {
-                          "pattern": "cspgo-*.tar.gz",
+                          "pattern": "diffie-hellman-service-*.tar.gz",
                           "target": "${snapshot}/apps/"
                         }
                       ]

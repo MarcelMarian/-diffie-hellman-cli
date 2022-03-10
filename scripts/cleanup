@@ -5,7 +5,7 @@
 set -eu
 
 DEFAULT_OS=linux
-DEFAULT_APPNAME=cspgo
+DEFAULT_APPNAME=diffie-hellman-service
 
 : "${OS:=${DEFAULT_OS}}"
 : "${APPNAME:=${DEFAULT_APPNAME}}"
