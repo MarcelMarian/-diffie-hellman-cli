@@ -21,7 +21,7 @@ rm -f *.gz
 rm -f bin/${APPNAME}
 rm -f bin/${OS}_arm64/${APPNAME}
 rm -f bin/${OS}_arm/${APPNAME}
-rm -rf ./cmd/${APPNAME}/*.pb.go
 rm -f go.mod
 rm -f go.sum
 rm -rf vendor/
+remove_dangling

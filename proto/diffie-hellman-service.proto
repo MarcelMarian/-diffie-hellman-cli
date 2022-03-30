@@ -13,6 +13,16 @@ message PKeyMessage {
 	bytes pubkey = 2;
 }
 
+message EncMessage {
+	int64 seqno = 1;
+	string data = 2;
+}
+
+message EncMessageResp {
+	int64 seqno = 1;
+	int32 retCode = 2;
+}
+
 ////////////////////////////
 // gRPC Service Definition's
 ////////////////////////////
@@ -20,4 +30,5 @@ message PKeyMessage {
 service DhGrpcService {
 	rpc Ping(PingPongMessage) returns (PingPongMessage){}
 	rpc CliXchgKey(PKeyMessage) returns (PKeyMessage){}
+	rpc XchgMessage(EncMessage) returns (EncMessageResp){}
 }

@@ -15,14 +15,10 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-// const KEY_SIZE = 512
-// const P = "61271898154419322402913024440198123382732149960235057225471551559239770736436621747379793612734389078706272816399549319441301204844108985665478747484068105492425710020816744984827139634377543254232771701666641573615214190348551853310282985759862672269412349682391914493241981043233177573321010505440643093947263406385397608140232899472170776780135562173526944799247913033079971501369669327224164080476260790806304425757096764862596989528589162680331979843703607953840323045069341362184099475644229674957294550371"
-const KEY_SIZE = 256
-const P = "3238753880965754610707105568739490849904386530527757910159357650928335564145344807150033057961040728754572345258544588226658050311871620937068496966107379908371318841510184359376017486618971516252558874080687260635543277811155538694637753722244763834358971"
-const G = 7
-
 var DefaultConfigFile = "/config/config-adapter.json"
+var DefaultDhConfigFile = "/config/config-dh.json"
 var configDataPtr *ClientConfig
+var configDhDataPtr *DhConfig
 var seqNo int32 = 0
 var err error
 
@@ -40,8 +36,8 @@ func initSignalHandle() {
 }
 
 func test() error {
-	p, _ := Prime(KEY_SIZE)
-	g := big.NewInt(5)
+	p, _ := Prime(int(configDhDataPtr.DhParams.KeySize))
+	g := big.NewInt(int64(configDhDataPtr.DhParams.G))
 
 	alice := NewDh()
 	alice.P = p
@@ -56,8 +52,8 @@ func test() error {
 
 	start := time.Now()
 
-	alice.PrivateKey, _ = Prime(KEY_SIZE)
-	bob.PrivateKey, _ = Prime(KEY_SIZE)
+	alice.PrivateKey, _ = Prime(int(configDhDataPtr.DhParams.KeySize))
+	bob.PrivateKey, _ = Prime(int(configDhDataPtr.DhParams.KeySize))
 
 	alice.AnswerKey = bob.Public()
 	bob.AnswerKey = alice.Public()
@@ -135,10 +131,10 @@ func calcPrivKey(client DhGrpcServiceClient, seqNo uint64) (sha string, err erro
 	alice := NewDh()
 	alice.P = new(big.Int)
 	alice.G = new(big.Int)
-	alice.P.SetBytes([]byte(P))
-	alice.G.SetUint64(G)
+	alice.P.SetBytes([]byte(configDhDataPtr.DhParams.P))
+	alice.G.SetUint64(uint64(configDhDataPtr.DhParams.G))
 
-	alice.PrivateKey, _ = Prime(KEY_SIZE)
+	alice.PrivateKey, _ = Prime(int(configDhDataPtr.DhParams.KeySize))
 
 	bobPublic, err := cliXchgKey(client, seqNo, alice.Public().Bytes())
 
@@ -149,6 +145,7 @@ func calcPrivKey(client DhGrpcServiceClient, seqNo uint64) (sha string, err erro
 		alice.AnswerKey.SetUint64(0)
 	}
 
+	// fmt.Println("Public Key:", alice.Public())
 	// fmt.Println("alice PrivateKey:", alice.PrivateKey)
 
 	// fmt.Println("alice AnswerKey:", alice.AnswerKey)
@@ -204,20 +201,28 @@ func main() {
 
 		// Check the server connection
 		err = ping(dhCli, "PING")
+		if err != nil {
+			time.Sleep(3 * time.Second)
+		} else {
+			break
+
+		}
+	}
+
+	// Initialize diffie-hellman interface
+	for {
+		configDhDataPtr = initDhConfig(DefaultDhConfigFile)
 		if err == nil {
 			break
 		}
 		time.Sleep(3 * time.Second)
 	}
-	// Initialize gRPC interface
 	fmt.Println("Diffie-Hellman gRPC client application initialization - DONE")
-
 	var seqNo uint64 = 1
 	for {
 		start := time.Now()
 
 		sha, _ := calcPrivKey(dhCli, seqNo)
-		fmt.Printf("%d.Key xchg duration t:%v\n\n", seqNo, time.Since(start).Seconds())
 
 		data := encrypt("The quick brown fox jumps over the lazy dog", sha)
 		fmt.Printf("%d.Encripted data = %s\n", seqNo, data)
