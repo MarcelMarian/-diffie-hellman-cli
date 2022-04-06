@@ -1,4 +1,3 @@
-diffie-hellman-service
 /.container-*
 /.dockerfile*
 /.build-image
