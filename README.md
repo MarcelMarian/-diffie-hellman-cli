@@ -55,7 +55,6 @@ The variables (and their default values are shown below).
 | `ARCH` | The value of GOARCH to use | `amd64` |
 | `APPNAME` | The name of the application binary | `diffie-hellman-service` |
 | `VERSION` | The semantic version of the application | `1.0.0` |
-| `REGISTRY` | The Docker Trusted Registry to push and pull to/from | `registry.gear.ge.com/csp` |
 | `BUILD_IMAGE` | The name of the build container | `diffie-hellman-service-golang:1.16.0-buster` |
 | `PROTODIR` | The location of protocol buffer files | `proto` |
 | `BASE_IMAGE` | The base of the application container | `scratch` |
@@ -84,20 +83,6 @@ The shell script `build/test.sh` is used to test the application.
 
 Run `scripts/buildcontainer` to containerise the application.
 
-### Pushing the Application Container
-
-Run `scripts/pushcontainer` to push the containerised application to a registry.
-
-- You may need to authenticate with the registry for this to complete without error.
-
-### Packaging the Application
-
-Run `scripts/packageapplication` to package the containerised application for Predix Edge OS deployment.
-
-### Signing the Packaged Application
-
-Run `scripts/signpackage` to sign the packaged application for deployment on production builds of Predix Edge OS.
-
 ### Cleaning Up
 
 Run `scripts/cleanup` to clean up the working directory.
@@ -109,72 +94,3 @@ Studio Code to develop in a container using Visual Studio Code. This has been te
 WSL2 and Docker Desktop installed. To use, first open the clonmed directory in WSL2 (Remote Explorer WSL
 Targets) and enter the container using the `Remote-Containers: Reopen in Container` command.
 
-# Propel CI/CD
-
-Build.GE's `Propel` self service CI/CD system is used to create a Jenkins pipeline to automatically build,
-unit test and deploy (to Artifactory) the Go application. To learn how to setup this facility please see the
-following page: [DevOps CTT - Propel CI/CD](https://stamp.gs.ec.ge.com/confluence/x/tQjOL). The file `Jenkinsfile`
-defines the build to `Jenkins` in declartive form.
-
-# Integration with Predix Edge (Development Build)
-
-## Manual method (using Edge Agent API)
-
-Discover the IP address of the Predix Edge OS instance to which you want to deploy the application.
-
-Copy the application `.tar.gz` file to the Predix Edge instance; for example:
-```bash
-scp ./diffie-hellman-service-1.0.0-amd64.tar.gz root@$IPADDR:/mnt/data/.
-```
-where `IPADDR` is the IP address of the target.
-
-Login to the target using ssh and deploy the application giving it an instance identifer of `diffie-hellman-service`:
-```bash
-cd /mnt/data
-curl http://localhost/api/v1/applications \
-    --unix-socket /var/run/edge-core/edge-core.sock \
-    -X POST \
-    -F "file=@diffie-hellman-service-1.0.0-amd64.tar.gz" \
-    -H "app_name: diffie-hellman-service"
-```
-
-The application can subsequently be deleted as follows:
-```bash
-curl http://localhost/api/v1/applications/diffie-hellman-service \
-    --unix-socket /var/run/edge-core/edge-core.sock \
-    -X DELETE
-```
-
-## Manual method (using ssh and Edge Agent tools)
-
-Discover the IP address of the Predix Edge OS instance to which you want to deploy the application.
-
-Two shell scripts `scp-file.sh` and `ssh-deploy.sh` are provided to perform this task (tested only on Linux)
-
-Copy the application `.tar.gz` file to the Predix Edge instance; for example:
-```bash
-scp ./diffie-hellman-service-1.0.0-amd64.tar.gz root@$IPADDR:/mnt/data/.
-```
-where `IPADDR` is the IP address of the target.
-
-Login to the target using ssh and deploy the application giving it an instance identifer of `diffie-hellman-service`,
-note we are able to do this by remounting the root file system as read write:
-```bash
-mount -o rw,remount /
-mv /mnt/data/diffie-hellman-service.tar.gz /opt/application-system-containers/diffie-hellman-service.tar.gz
-docker stack rm diffie-hellman-service
-set -o allexport
-. /opt/edge-agent/edge-agent-environment
-set +o allexport
-sleep 5
-/opt/edge-agent/app-deploy diffie-hellman-service /opt/application-system-containers/diffie-hellman-service.tar.gz
-```
-
-The application can subsequently be deleted as follows:
-```bash
-/opt/edge-agent/app-delete --appInstanceId=diffie-hellman-service
-```
-
-## Predix Edge Technician Console (PETC) Method
-
-Use PETC as described here: [PETC](https://docsstaging.predix.io/en-US/content/service/edge_software_and_services/predix_edge_device_configuration_and_enrollment/) to upload and manage the application.
